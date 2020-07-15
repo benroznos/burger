@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <h1>Burgers!!!</h1>
+  <label for="name">New Burgers</label>
+  <input type="text" name="name" id= "burgerName">
+  <button id = "burgerBtn">Add a Burger</button>
+  <div>
+    <ol id= 'burgerList'>
+    </ol>
+  </div>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script>
+    document.getElementById('burgerBtn').addEventListener('click', event=>{
+      event.preventDefault()
+      axios.post('/api/burger',{
+        name: `${document.getElementById('burgerName').value}`
+      })
+    })
+      function getBurgers() {
+        axios.get('/api/burger')
+          .then(({ data }) => {
+            console.log(data)
+            document.getElementById('burgerList').innerHTML = ''
+            data.forEach(each => {
+              let burgerElem = document.createElement('li')
+              let burgerButton = document.createElement('button')
+              burgerButton.dataset.id = each.id
+              burgerElem.textContent = `${each.burger_name}`
+
+              if (each.devoured) {
+                burgerElem.style.backgroundColor = "green"
+                burgerButton.textContent = "already devoured"
+                burgerButton.addEventListener('click', event => {
+                  event.preventDefault()
+                  axios.delete(`/api/burgers/${each.id}`)
+                    .then((info) => {
+                      console.log(info)
+                      getBurgers()
+                    })
+                    .catch(err => console.log(err))
+                })
+              } else {
+                burgerElem.style.backgroundColor = "red"
+                burgerButton.textContent = 'devour'
+                burgerButton.addEventListener('click', event => {
+                  console.log(`${each.id}`)
+                  event.preventDefault()
+                  axios.put(`/api/burger`, { id: each.id })
+                    .then((info) => {
+                      console.log(info)
+                      getBurgers()
+                    })
+                    .catch(err => console.log(err))
+                })
+              }
+              burgerElem.append(burgerButton)
+              document.getElementById('burgerList').append(burgerElem)
+            })
+          })
+          .catch(err => console.log(err))
+      }
+      getBurgers()
+  </script>
+</body>
+</html>
