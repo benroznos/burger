@@ -13,6 +13,4 @@ app.set('view engine', 'handlebars')
 app.get('/',(req,res)=>{
   res.render('index.handlebars')
 })
-app.listen(3000,()=>{
-  console.log('local server 3000')
-})
+app.listen(process.env.PORT,()=> console.log('http://localhost:3000'))
